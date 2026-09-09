@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>像素小宠</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, sans-serif;
+        }
+        body {
+            background-color: #f7f7f7;
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            color:#222;
+        }
+        .page{
+            display:none;
+            padding:20px 16px;
+        }
+        .page.active{
+            display:block;
+        }
+        .card{
+            background:#ffffff;
+            border-radius:24px;
+            padding:24px;
+            box-shadow: 0 2px 12px #0000000c;
+        }
+        .btn{
+            width:100%;
+            padding:14px;
+            border-radius:16px;
+            border:none;
+            background:#eeeeee;
+            font-size:17px;
+            margin:8px 0;
+            cursor:pointer;
+        }
+        .btn:active{
+            background:#dddddd;
+        }
+        .btn-primary{
+            background:#222;
+            color:#fff;
+        }
+        .bar-wrap{
+            width:100%;
+            height:12px;
+            background:#e8e8e8;
+            border-radius:10px;
+            margin:6px 0 16px;
+        }
+        .bar-fill{
+            height:100%;
+            background:#333;
+            border-radius:10px;
+            transition:0.3s;
+        }
+        .bottom-nav{
+            position:fixed;
+            bottom:0;
+            left:50%;
+            transform:translateX(-50%);
+            max-width:480px;
+            width:100%;
+            display:flex;
+            background:#fff;
+            padding:10px 0;
+            border-top:1px solid #eee;
+        }
+        .nav-item{
+            flex:1;
+            text-align:center;
+            font-size:14px;
+            cursor:pointer;
+        }
+        .pet-sprite{
+            font-size:80px;
+            text-align:center;
+            margin:10px 0 20px;
+        }
+        .row-two{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:10px;
+        }
+        .tip-popup{
+            position:fixed;
+            top:30px;
+            left:50%;
+            transform:translateX(-50%);
+            background:#222;
+            color:white;
+            padding:12px 22px;
+            border-radius:12px;
+            z-index:99;
+            display:none;
+        }
+        .pet-item{
+            text-align:center;
+            padding:12px;
+            background:#fff;
+            border-radius:16px;
+            margin:8px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="tip-popup" id="tip"></div>
+
+<!-- 开屏页 -->
+<div id="page-splash" class="page active" style="padding-top:120px;text-align:center;">
+    <h1 style="font-size:42px;">像素小宠</h1>
+    <div class="pet-sprite">🐑</div>
+    <p style="margin:20px 0;color:#666">简约单机宠物养成</p>
+    <button class="btn btn-primary" onclick="goPage('page-select')">开始游戏</button>
+</div>
+
+<!-- 宠物选择领养页 -->
+<div id="page-select" class="page">
+    <h2>领养你的小宠物</h2>
+    <div class="pet-item" onclick="adopt('sheep','🐑','绵羊')">
+        <div style="font-size:60px">🐑</div>
+        <h3>绵羊</h3>
+        <p>温顺可爱</p>
+    </div>
+    <div class="pet-item" onclick="adopt('cat','🐱','小猫')">
+        <div style="font-size:60px">🐱</div>
+        <h3>小猫</h3>
+        <p>活泼调皮</p>
+    </div>
+    <div class="pet-item" onclick="adopt('dog','🐶','小狗')">
+        <div style="font-size:60px">🐶</div>
+        <h3>小狗</h3>
+        <p>忠诚乖巧</p>
+    </div>
+</div>
+
+<!-- 主页 -->
+<div id="page-home" class="page">
+    <div class="card">
+        <div class="pet-sprite" id="petEmoji">🐑</div>
+        <h2 id="petName">绵羊 Lv.1</h2>
+
+        <div>
+            <div style="display:flex;justify-content:space-between">
+                <span>饥饿</span><span id="hungerVal">100</span>
+            </div>
+            <div class="bar-wrap"><div class="bar-fill" id="barHunger" style="width:100%"></div></div>
+        </div>
+        <div>
+            <div style="display:flex;justify-content:space-between">
+                <span>体力</span><span id="energyVal">100</span>
+            </div>
+            <div class="bar-wrap"><div class="bar-fill" id="barEnergy" style="width:100%"></div></div>
+        </div>
+        <div>
+            <div style="display:flex;justify-content:space-between">
+                <span>心情</span><span id="moodVal">100</span>
+            </div>
+            <div class="bar-wrap"><div class="bar-fill" id="barMood" style="width:100%"></div></div>
+        </div>
+        <div>
+            <div style="display:flex;justify-content:space-between">
+                <span>清洁</span><span id="cleanVal">100</span>
+            </div>
+            <div class="bar-wrap"><div class="bar-fill" id="barClean" style="width:100%"></div></div>
+        </div>
+        <p style="margin:10px 0">年龄：<span id="ageText">0天</span>｜金币：<span id="goldText">100</span></p>
+
+        <div class="row-two">
+            <button class="btn" onclick="feed()">🍚喂食</button>
+            <button class="btn" onclick="play()">🎾玩耍</button>
+        </div>
+        <div class="row-two">
+            <button class="btn" onclick="clean()">🧼清洁</button>
+            <button class="btn" onclick="sleep()">💤睡觉</button>
+        </div>
+    </div>
+</div>
+
+<!-- 背包 -->
+<div id="page-bag" class="page">
+    <h2>背包</h2>
+    <div class="card">
+        <p>食物 x<span id="foodNum">5</span></p>
+        <p>清洁剂 x<span id="soapNum">3</span></p>
+    </div>
+</div>
+
+<!-- 任务 -->
+<div id="page-task" class="page">
+    <h2>每日任务</h2>
+    <div class="card">
+        <div style="margin:12px 0">
+            <p>喂食宠物1次 (+20金币)</p>
+            <button class="btn" id="taskFeedBtn" onclick="claimTask('feed')">领取</button>
+        </div>
+        <div style="margin:12px 0">
+            <p>陪宠物玩耍1次 (+20金币)</p>
+            <button class="btn" id="taskPlayBtn" onclick="claimTask('play')">领取</button>
+        </div>
+    </div>
+</div>
+
+<!-- 设置 -->
+<div id="page-setting" class="page">
+    <h2>设置</h2>
+    <div class="card">
+        <button class="btn" onclick="resetGame()">重置游戏存档</button>
+    </div>
+</div>
+
+<!--底部导航-->
+<div class="bottom-nav" id="navBar" style="display:none;">
+    <div class="nav-item" onclick="goPage('page-home')">🏠主页</div>
+    <div class="nav-item" onclick="goPage('page-bag')">🎒背包</div>
+    <div class="nav-item" onclick="goPage('page-task')">📋任务</div>
+    <div class="nav-item" onclick="goPage('page-setting')">⚙设置</div>
+</div>
+
+<script>
+//游戏数据
+let gameData = {
+    petType:'sheep',
+    petEmoji:'🐑',
+    petName:'绵羊',
+    level:1,
+    exp:0,
+    hunger:100,
+    energy:100,
+    mood:100,
+    clean:100,
+    age:0,
+    gold:100,
+    food:5,
+    soap:3,
+    isSleep:false,
+    task:{feed:false,play:false}
+};
+
+//提示弹窗
+function showTip(msg){
+    const t = document.getElementById('tip');
+    t.innerText=msg;
+    t.style.display='block';
+    setTimeout(()=>t.style.display='none',1500);
+}
+
+//页面切换
+function goPage(pageId){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+}
+
+//领养宠物
+function adopt(type,emoji,name){
+    gameData.petType=type;
+    gameData.petEmoji=emoji;
+    gameData.petName=name;
+    saveData();
+    document.getElementById('navBar').style.display='flex';
+    refreshHome();
+    goPage('page-home');
+    showTip(`领养成功！你的${name}来了`);
+}
+
+//刷新主页UI
+function refreshHome(){
+    document.getElementById('petEmoji').innerText=gameData.petEmoji;
+    document.getElementById('petName').innerText=`${gameData.petName} Lv.${gameData.level}`;
+
+    document.getElementById('hungerVal').innerText=Math.round(gameData.hunger);
+    document.getElementById('barHunger').style.width = gameData.hunger+'%';
+
+    document.getElementById('energyVal').innerText=Math.round(gameData.energy);
+    document.getElementById('barEnergy').style.width = gameData.energy+'%';
+
+    document.getElementById('moodVal').innerText=Math.round(gameData.mood);
+    document.getElementById('barMood').style.width = gameData.mood+'%';
+
+    document.getElementById('cleanVal').innerText=Math.round(gameData.clean);
+    document.getElementById('barClean').style.width = gameData.clean+'%';
+
+    document.getElementById('ageText').innerText = gameData.age + "天";
+    document.getElementById('goldText').innerText = gameData.gold;
+
+    document.getElementById('foodNum').innerText = gameData.food;
+    document.getElementById('soapNum').innerText = gameData.soap;
+}
+
+//喂食
+function feed(){
+    if(gameData.isSleep){showTip("宠物正在睡觉，不能喂食");return;}
+    if(gameData.food<=0){showTip("没有食物了！");return;}
+    if(gameData.hunger>=95){showTip("已经吃饱啦");return;}
+    gameData.food--;
+    gameData.hunger = Math.min(100,gameData.hunger+30);
+    gameData.exp +=10;
+    gameData.task.feed=true;
+    checkLevelUp();
+    saveData();refreshHome();
+    showTip("投喂成功！");
+}
+
+//玩耍
+function play(){
+    if(gameData.isSleep){showTip("睡觉中不能玩耍");return;}
+    if(gameData.energy<20){showTip("体力不足，需要睡觉");return;}
+    gameData.energy -=20;
+    gameData.mood = Math.min(100,gameData.mood+25);
+    gameData.exp +=15;
+    gameData.task.play=true;
+    checkLevelUp();
+    saveData();refreshHome();
+    showTip("玩得很开心！");
+}
+
+//清洁
+function clean(){
+    if(gameData.isSleep){showTip("睡觉中");return;}
+    if(gameData.soap<=0){showTip("没有清洁剂");return;}
+    gameData.soap--;
+    gameData.clean=100;
+    saveData();refreshHome();
+    showTip("洗干净啦");
+}
+
+//睡觉
+function sleep(){
+    if(gameData.isSleep){showTip("已经在睡觉了");return;}
+    gameData.isSleep=true;
+    showTip("宠物开始睡觉恢复体力");
+    let sleepTimer = setInterval(()=>{
+        gameData.energy +=8;
+        refreshHome();
+        if(gameData.energy>=100){
+            gameData.isSleep=false;
+            clearInterval(sleepTimer);
+            showTip("睡醒啦，体力回满");
+            saveData();
+        }
+    },1000);
+    saveData();
+}
+
+//升级
+function checkLevelUp(){
+    const need = gameData.level*50;
+    if(gameData.exp >= need){
+        gameData.exp -= need;
+        gameData.level++;
+        showTip(`🎉升级！Lv.${gameData.level}`);
+    }
+}
+
+//领取任务
+function claimTask(type){
+    if(!gameData.task[type]){showTip("任务还没完成");return;}
+    gameData.gold +=20;
+    gameData.task[type]=false;
+    saveData();refreshHome();
+    showTip("领取20金币！");
+}
+
+//时间流逝模拟
+setInterval(()=>{
+    if(!gameData.isSleep){
+        gameData.hunger = Math.max(0,gameData.hunger-0.4);
+        gameData.mood = Math.max(0,gameData.mood-0.2);
+        gameData.clean = Math.max(0,gameData.clean-0.15);
+    }
+    gameData.age += 0.02;
+    refreshHome();
+    saveData();
+},2000);
+
+//本地存档
+function saveData(){
+    localStorage.setItem("petSave",JSON.stringify(gameData));
+}
+function loadData(){
+    const s = localStorage.getItem("petSave");
+    if(s){
+        gameData = JSON.parse(s);
+        document.getElementById('navBar').style.display='flex';
+        goPage('page-home');
+        refreshHome();
+    }
+}
+function resetGame(){
+    localStorage.removeItem("petSave");
+    location.reload();
+}
+
+loadData();
+</script>
+</body>
+</html>
